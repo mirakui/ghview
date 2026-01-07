@@ -1,0 +1,9 @@
+# TestDriver AI configuration
+version: 6.1
+prerun:
+  # macOSでTauriアプリを起動
+  - command: exec
+    lang: bash
+    script: |
+      cd "$(pwd)" && pnpm tauri dev &
+      sleep 10  # アプリ起動を待機

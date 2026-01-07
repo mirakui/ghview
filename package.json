@@ -9,7 +9,12 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:desktop": "npx tsx e2e/desktop-test.ts",
+    "testdriver": "testdriverai",
+    "testdriver:run": "testdriverai run .testdriver/hello-world.yaml"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
@@ -18,15 +23,19 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@tauri-apps/cli": "^2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@types/jsdom": "^27.0.0",
+    "@types/node": "^25.0.3",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
     "jsdom": "^27.4.0",
+    "testdriverai": "^6.1.11",
+    "tsx": "^4.21.0",
     "typescript": "~5.8.3",
     "vite": "^7.0.4",
     "vitest": "^4.0.16"

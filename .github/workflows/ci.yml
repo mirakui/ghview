@@ -91,19 +91,7 @@ jobs:
 
   build-tauri:
     needs: [lint-and-test, rust-check]
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: ubuntu-24.04
-            target: x86_64-unknown-linux-gnu
-          - platform: macos-latest
-            target: x86_64-apple-darwin
-          - platform: macos-latest
-            target: aarch64-apple-darwin
-          - platform: windows-latest
-            target: x86_64-pc-windows-msvc
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
@@ -122,10 +110,9 @@ jobs:
         uses: dtolnay/rust-toolchain@f7ccc83f9ed1e5b9c81d8a67d7ad1a747e22a561 # stable
         with:
           toolchain: stable
-          targets: ${{ matrix.target }}
+          targets: x86_64-unknown-linux-gnu
 
-      - name: Install Tauri dependencies (Ubuntu)
-        if: matrix.platform == 'ubuntu-24.04'
+      - name: Install Tauri dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
@@ -134,12 +121,12 @@ jobs:
         run: pnpm install
 
       - name: Build Tauri app
-        run: pnpm tauri build --target ${{ matrix.target }}
+        run: pnpm tauri build --target x86_64-unknown-linux-gnu
 
       - name: Upload artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: tauri-${{ matrix.target }}
+          name: tauri-x86_64-unknown-linux-gnu
           path: |
-            src-tauri/target/${{ matrix.target }}/release/bundle/
+            src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/
           if-no-files-found: error

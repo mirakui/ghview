@@ -3,4 +3,3 @@ type = "keychain"
 service = "ghview"
 
 [secrets]
-TD_API_KEY = { provider = "keychain", value = "td-api-key" }

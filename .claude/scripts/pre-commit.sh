@@ -29,6 +29,15 @@ if echo "$COMMAND" | grep -qE '^\s*git\s+commit(\s|$)'; then
     exit 2
   fi
 
+  # Run Rust formatter
+  if [ -d "src-tauri" ]; then
+    echo "Running Rust formatter..."
+    if ! cargo fmt --manifest-path src-tauri/Cargo.toml; then
+      echo "Rust formatter failed"
+      exit 2
+    fi
+  fi
+
   echo "Formatter and linter completed successfully"
 fi
 

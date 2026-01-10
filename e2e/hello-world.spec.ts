@@ -2,21 +2,25 @@ import { test, expect } from "@playwright/test";
 
 // Basic browser-based test for the Tauri frontend
 // This tests the web view content directly via Playwright
-test.describe("Hello World App", () => {
-  test("should display Hello, World heading", async ({ page }) => {
+test.describe("GitHub PR List App", () => {
+  test("should display login screen when not authenticated", async ({
+    page,
+  }) => {
     await page.goto("http://localhost:1420");
 
-    // Wait for the heading to be visible
-    const heading = page.locator("h1");
+    // Wait for the welcome heading to be visible
+    const heading = page.locator("h2");
     await expect(heading).toBeVisible();
-    await expect(heading).toHaveText("Hello, World");
+    await expect(heading).toHaveText("Welcome to ghview");
   });
 
-  test("should have correct page title structure", async ({ page }) => {
+  test("should display sign in button", async ({ page }) => {
     await page.goto("http://localhost:1420");
 
-    // Verify main container exists
-    const container = page.locator("main.container");
-    await expect(container).toBeVisible();
+    // Verify sign in button exists
+    const signInButton = page.locator("button", {
+      hasText: "Sign in with GitHub",
+    });
+    await expect(signInButton).toBeVisible();
   });
 });

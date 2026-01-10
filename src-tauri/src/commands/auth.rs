@@ -1,7 +1,5 @@
 use keyring::Entry;
-use rand::Rng;
 use serde::{Deserialize, Serialize};
-use tauri::Manager;
 use thiserror::Error;
 
 const KEYRING_SERVICE: &str = "ghview";
@@ -48,6 +46,7 @@ struct DeviceCodeResponse {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct AccessTokenResponse {
     access_token: Option<String>,
     token_type: Option<String>,

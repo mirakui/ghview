@@ -26,6 +26,7 @@ impl serde::Serialize for GitHubError {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct SearchResponse {
     total_count: i32,
     incomplete_results: bool,

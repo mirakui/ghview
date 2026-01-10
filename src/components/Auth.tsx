@@ -25,9 +25,12 @@ export function Auth({
 
   useEffect(() => {
     if (deviceFlow && !authStatus?.authenticated) {
-      pollIntervalRef.current = window.setInterval(() => {
-        onPollLogin();
-      }, (deviceFlow.interval + 1) * 1000);
+      pollIntervalRef.current = window.setInterval(
+        () => {
+          onPollLogin();
+        },
+        (deviceFlow.interval + 1) * 1000
+      );
     }
 
     return () => {

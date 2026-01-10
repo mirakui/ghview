@@ -54,7 +54,10 @@ export function PrList({ prs, loading, error }: PrListProps) {
       </header>
       <div className="pr-list-items">
         {prs.map((prWithChecks) => (
-          <PrCard key={prWithChecks.pull_request.id} prWithChecks={prWithChecks} />
+          <PrCard
+            key={prWithChecks.pull_request.id}
+            prWithChecks={prWithChecks}
+          />
         ))}
       </div>
     </div>

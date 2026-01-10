@@ -30,12 +30,13 @@ function formatRelativeTime(dateString: string): string {
 }
 
 function CheckStatusIndicator({ state }: { state: CheckState }) {
-  const statusConfig: Record<CheckState, { icon: string; className: string }> = {
-    success: { icon: "✓", className: "check-success" },
-    failure: { icon: "✗", className: "check-failure" },
-    pending: { icon: "○", className: "check-pending" },
-    error: { icon: "!", className: "check-error" },
-  };
+  const statusConfig: Record<CheckState, { icon: string; className: string }> =
+    {
+      success: { icon: "✓", className: "check-success" },
+      failure: { icon: "✗", className: "check-failure" },
+      pending: { icon: "○", className: "check-pending" },
+      error: { icon: "!", className: "check-error" },
+    };
 
   const config = statusConfig[state];
 
@@ -79,7 +80,9 @@ export function PrCard({ prWithChecks }: PrCardProps) {
           />
           <span className="pr-author">{pr.user.login}</span>
           <span className="pr-separator">•</span>
-          <span className="pr-updated">updated {formatRelativeTime(pr.updated_at)}</span>
+          <span className="pr-updated">
+            updated {formatRelativeTime(pr.updated_at)}
+          </span>
         </div>
       </div>
 

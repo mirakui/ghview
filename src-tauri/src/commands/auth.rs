@@ -198,7 +198,9 @@ pub async fn poll_device_flow(device_code: String) -> Result<AuthStatus, AuthErr
         }
     }
 
-    Err(AuthError::OAuth("Failed to obtain access token".to_string()))
+    Err(AuthError::OAuth(
+        "Failed to obtain access token".to_string(),
+    ))
 }
 
 #[tauri::command]

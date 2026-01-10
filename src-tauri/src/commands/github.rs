@@ -188,12 +188,16 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
             // Fallback: extract repo info from URL
             let parts: Vec<&str> = item.repository_url.split('/').collect();
             let repo_name = parts.last().unwrap_or(&"unknown").to_string();
-            let owner_name = parts.get(parts.len().saturating_sub(2)).unwrap_or(&"unknown");
+            let owner_name = parts
+                .get(parts.len().saturating_sub(2))
+                .unwrap_or(&"unknown");
             Repository {
                 id: 0,
                 name: repo_name.clone(),
                 full_name: format!("{}/{}", owner_name, repo_name),
-                html_url: item.repository_url.replace("api.github.com/repos", "github.com"),
+                html_url: item
+                    .repository_url
+                    .replace("api.github.com/repos", "github.com"),
                 owner: User {
                     id: 0,
                     login: owner_name.to_string(),
@@ -222,7 +226,11 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
                 requested_reviewers: Vec<ApiUser>,
             }
             let pr_detail: PrDetail = pr_response.json().await?;
-            pr_detail.requested_reviewers.into_iter().map(|u| u.into()).collect()
+            pr_detail
+                .requested_reviewers
+                .into_iter()
+                .map(|u| u.into())
+                .collect()
         } else {
             item.requested_reviewers
                 .unwrap_or_default()

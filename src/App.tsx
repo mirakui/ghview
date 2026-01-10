@@ -35,7 +35,11 @@ function App() {
         <main className="main-content">
           <div className="main-header">
             <h1>Pull Requests</h1>
-            <button className="refresh-btn" onClick={refresh} disabled={prsLoading}>
+            <button
+              className="refresh-btn"
+              onClick={refresh}
+              disabled={prsLoading}
+            >
               {prsLoading ? "Refreshing..." : "Refresh"}
             </button>
           </div>

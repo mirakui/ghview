@@ -57,7 +57,9 @@ export function PullRequestList() {
   }
 
   if (pullRequests.length === 0) {
-    return <div className="pr-empty">No pull requests awaiting your review</div>;
+    return (
+      <div className="pr-empty">No pull requests awaiting your review</div>
+    );
   }
 
   return (
@@ -67,7 +69,12 @@ export function PullRequestList() {
         {pullRequests.map((pr) => (
           <li key={pr.id} className="pr-item">
             <div className="pr-header">
-              <a href={pr.html_url} target="_blank" rel="noopener noreferrer" className="pr-title">
+              <a
+                href={pr.html_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pr-title"
+              >
                 {pr.title}
               </a>
               {pr.draft && <span className="pr-draft-badge">Draft</span>}
@@ -76,7 +83,11 @@ export function PullRequestList() {
               <span className="pr-repo">{pr.repository.full_name}</span>
               <span className="pr-number">#{pr.number}</span>
               <span className="pr-author">
-                <img src={pr.user.avatar_url} alt={pr.user.login} className="pr-avatar" />
+                <img
+                  src={pr.user.avatar_url}
+                  alt={pr.user.login}
+                  className="pr-avatar"
+                />
                 {pr.user.login}
               </span>
             </div>

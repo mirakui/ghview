@@ -23,14 +23,18 @@ describe("Auth", () => {
   describe("when not authenticated", () => {
     it("displays sign in button", () => {
       render(<Auth {...defaultProps} />);
-      expect(screen.getByRole("button", { name: /sign in with github/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /sign in with github/i })
+      ).toBeInTheDocument();
     });
 
     it("calls onStartLogin when sign in is clicked", () => {
       const onStartLogin = vi.fn();
       render(<Auth {...defaultProps} onStartLogin={onStartLogin} />);
 
-      fireEvent.click(screen.getByRole("button", { name: /sign in with github/i }));
+      fireEvent.click(
+        screen.getByRole("button", { name: /sign in with github/i })
+      );
 
       expect(onStartLogin).toHaveBeenCalled();
     });
@@ -52,7 +56,9 @@ describe("Auth", () => {
       );
 
       expect(screen.getByText("ABCD-1234")).toBeInTheDocument();
-      expect(screen.getByText(/github.com\/login\/device/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/github.com\/login\/device/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -66,7 +72,9 @@ describe("Auth", () => {
       );
 
       expect(screen.getByText(/testuser/i)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /logout/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /logout/i })
+      ).toBeInTheDocument();
     });
 
     it("calls onLogout when logout button is clicked", () => {
@@ -87,11 +95,11 @@ describe("Auth", () => {
 
   describe("error handling", () => {
     it("displays error message when error is present", () => {
-      render(
-        <Auth {...defaultProps} error="Failed to start device flow" />
-      );
+      render(<Auth {...defaultProps} error="Failed to start device flow" />);
 
-      expect(screen.getByText(/failed to start device flow/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/failed to start device flow/i)
+      ).toBeInTheDocument();
     });
   });
 });

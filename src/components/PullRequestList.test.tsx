@@ -26,7 +26,10 @@ describe("PullRequestList", () => {
         number: 123,
         title: "Fix bug in login",
         html_url: "https://github.com/owner/repo/pull/123",
-        user: { login: "author1", avatar_url: "https://example.com/avatar1.png" },
+        user: {
+          login: "author1",
+          avatar_url: "https://example.com/avatar1.png",
+        },
         created_at: "2024-01-15T10:00:00Z",
         updated_at: "2024-01-16T12:00:00Z",
         repository: { full_name: "owner/repo" },
@@ -38,7 +41,10 @@ describe("PullRequestList", () => {
         number: 456,
         title: "Add new feature",
         html_url: "https://github.com/owner/repo2/pull/456",
-        user: { login: "author2", avatar_url: "https://example.com/avatar2.png" },
+        user: {
+          login: "author2",
+          avatar_url: "https://example.com/avatar2.png",
+        },
         created_at: "2024-01-14T09:00:00Z",
         updated_at: "2024-01-15T11:00:00Z",
         repository: { full_name: "owner/repo2" },
@@ -73,7 +79,9 @@ describe("PullRequestList", () => {
     render(<PullRequestList />);
 
     await waitFor(() => {
-      expect(screen.getByText(/failed to fetch pull requests/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/failed to fetch pull requests/i)
+      ).toBeInTheDocument();
     });
   });
 

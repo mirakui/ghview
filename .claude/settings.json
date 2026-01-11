@@ -1,4 +1,9 @@
 {
+  "permissions": {
+    "allow": [
+      "Skill(verify)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {

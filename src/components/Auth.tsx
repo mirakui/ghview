@@ -76,7 +76,18 @@ export function Auth({
           >
             {deviceFlow.verification_uri}
           </a>
-          <div className="auth-user-code">{deviceFlow.user_code}</div>
+          <div className="auth-user-code-container">
+            <div className="auth-user-code">{deviceFlow.user_code}</div>
+            <button
+              className="auth-copy-btn"
+              onClick={() =>
+                navigator.clipboard.writeText(deviceFlow.user_code)
+              }
+              aria-label="Copy code"
+            >
+              Copy
+            </button>
+          </div>
           <p className="auth-waiting">Waiting for authorization...</p>
         </div>
       </div>

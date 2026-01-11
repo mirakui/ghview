@@ -123,10 +123,17 @@
   text-decoration: underline;
 }
 
+.auth-user-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 .auth-user-code {
   display: inline-block;
   padding: 12px 24px;
-  margin-bottom: 16px;
   font-size: 24px;
   font-weight: 600;
   font-family: monospace;
@@ -135,6 +142,22 @@
   border: 1px solid var(--border-color, #d0d7de);
   border-radius: 6px;
   color: var(--text-primary, #24292f);
+}
+
+.auth-copy-btn {
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary, #24292f);
+  background: var(--btn-bg, #f6f8fa);
+  border: 1px solid var(--border-color, #d0d7de);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.auth-copy-btn:hover {
+  background: var(--btn-hover-bg, #f3f4f6);
 }
 
 .auth-waiting {

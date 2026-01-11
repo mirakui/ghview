@@ -41,24 +41,40 @@ describe("Auth", () => {
   });
 
   describe("when device flow is active", () => {
+    const deviceFlowProps = {
+      user_code: "ABCD-1234",
+      verification_uri: "https://github.com/login/device",
+      device_code: "device123",
+      expires_in: 900,
+      interval: 5,
+    };
+
     it("displays user code and verification uri", () => {
-      render(
-        <Auth
-          {...defaultProps}
-          deviceFlow={{
-            user_code: "ABCD-1234",
-            verification_uri: "https://github.com/login/device",
-            device_code: "device123",
-            expires_in: 900,
-            interval: 5,
-          }}
-        />
-      );
+      render(<Auth {...defaultProps} deviceFlow={deviceFlowProps} />);
 
       expect(screen.getByText("ABCD-1234")).toBeInTheDocument();
       expect(
         screen.getByText(/github.com\/login\/device/i)
       ).toBeInTheDocument();
+    });
+
+    it("displays copy button", () => {
+      render(<Auth {...defaultProps} deviceFlow={deviceFlowProps} />);
+
+      expect(screen.getByRole("button", { name: /copy/i })).toBeInTheDocument();
+    });
+
+    it("copies user code to clipboard when copy button is clicked", async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined);
+      Object.assign(navigator, {
+        clipboard: { writeText },
+      });
+
+      render(<Auth {...defaultProps} deviceFlow={deviceFlowProps} />);
+
+      fireEvent.click(screen.getByRole("button", { name: /copy/i }));
+
+      expect(writeText).toHaveBeenCalledWith("ABCD-1234");
     });
   });
 

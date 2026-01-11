@@ -80,6 +80,7 @@ pub fn delete_credentials() -> Result<(), CredentialError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serial_test::serial;
     use std::env;
     use std::fs;
 
@@ -113,6 +114,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_get_credentials_path() {
         let _env = TestEnv::new();
         let path = get_credentials_path().unwrap();
@@ -120,6 +122,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_save_and_load_credentials() {
         let _env = TestEnv::new();
         let credentials = Credentials {
@@ -132,6 +135,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_load_credentials_not_found() {
         let _env = TestEnv::new();
         let result = load_credentials();
@@ -139,6 +143,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_delete_credentials() {
         let _env = TestEnv::new();
         let credentials = Credentials {
@@ -153,6 +158,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_delete_credentials_not_found() {
         let _env = TestEnv::new();
         // Should not error if file doesn't exist
@@ -161,6 +167,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn test_credentials_json_format() {
         let _env = TestEnv::new();
         let credentials = Credentials {

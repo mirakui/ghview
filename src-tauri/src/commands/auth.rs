@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use super::credential::{delete_credentials, load_credentials, save_credentials, Credentials};
+use super::debug::{log_request, log_response, log_response_error};
 
 // GitHub OAuth App credentials for ghview
 // Device flow doesn't require a client secret
@@ -73,8 +74,10 @@ pub async fn check_auth_status() -> Result<AuthStatus, AuthError> {
         Ok(credentials) => {
             // Verify token by fetching user info
             let client = reqwest::Client::new();
+            let url = "https://api.github.com/user";
+            log_request("GET", url);
             let response = client
-                .get("https://api.github.com/user")
+                .get(url)
                 .header(
                     "Authorization",
                     format!("Bearer {}", credentials.access_token),
@@ -83,6 +86,7 @@ pub async fn check_auth_status() -> Result<AuthStatus, AuthError> {
                 .header("Accept", "application/vnd.github+json")
                 .send()
                 .await?;
+            log_response(url, response.status());
 
             if response.status().is_success() {
                 let user: GitHubUser = response.json().await?;
@@ -109,16 +113,21 @@ pub async fn check_auth_status() -> Result<AuthStatus, AuthError> {
 #[tauri::command]
 pub async fn start_device_flow() -> Result<DeviceFlowInit, AuthError> {
     let client = reqwest::Client::new();
+    let url = "https://github.com/login/device/code";
 
+    log_request("POST", url);
     let response = client
-        .post("https://github.com/login/device/code")
+        .post(url)
         .header("Accept", "application/json")
         .form(&[("client_id", GITHUB_CLIENT_ID), ("scope", "repo")])
         .send()
         .await?;
+    log_response(url, response.status());
 
     if !response.status().is_success() {
+        let status = response.status();
         let error_text = response.text().await.unwrap_or_default();
+        log_response_error(url, status, &error_text);
         return Err(AuthError::OAuth(format!(
             "Failed to start device flow: {}",
             error_text
@@ -139,9 +148,11 @@ pub async fn start_device_flow() -> Result<DeviceFlowInit, AuthError> {
 #[tauri::command]
 pub async fn poll_device_flow(device_code: String) -> Result<AuthStatus, AuthError> {
     let client = reqwest::Client::new();
+    let url = "https://github.com/login/oauth/access_token";
 
+    log_request("POST", url);
     let response = client
-        .post("https://github.com/login/oauth/access_token")
+        .post(url)
         .header("Accept", "application/json")
         .form(&[
             ("client_id", GITHUB_CLIENT_ID),
@@ -150,6 +161,7 @@ pub async fn poll_device_flow(device_code: String) -> Result<AuthStatus, AuthErr
         ])
         .send()
         .await?;
+    log_response(url, response.status());
 
     let token_response: AccessTokenResponse = response.json().await?;
 
@@ -175,13 +187,16 @@ pub async fn poll_device_flow(device_code: String) -> Result<AuthStatus, AuthErr
         save_credentials(&credentials).map_err(|e| AuthError::Credential(e.to_string()))?;
 
         // Get username
+        let user_url = "https://api.github.com/user";
+        log_request("GET", user_url);
         let user_response = client
-            .get("https://api.github.com/user")
+            .get(user_url)
             .header("Authorization", format!("Bearer {}", access_token))
             .header("User-Agent", "ghview")
             .header("Accept", "application/vnd.github+json")
             .send()
             .await?;
+        log_response(user_url, user_response.status());
 
         if user_response.status().is_success() {
             let user: GitHubUser = user_response.json().await?;

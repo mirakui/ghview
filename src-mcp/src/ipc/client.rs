@@ -84,19 +84,4 @@ impl IpcClient {
         )
         .await
     }
-
-    #[allow(dead_code)]
-    pub async fn ping(&self) -> Result<String> {
-        self.send_request("ping", serde_json::json!({})).await
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_socket_path_not_empty() {
-        assert!(!SOCKET_PATH.is_empty());
-    }
 }

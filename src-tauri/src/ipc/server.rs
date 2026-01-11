@@ -15,11 +15,6 @@ const SOCKET_PATH: &str = "/tmp/ghview.sock";
 #[cfg(target_os = "windows")]
 const SOCKET_PATH: &str = r"\\.\pipe\ghview";
 
-#[allow(dead_code)]
-pub fn get_socket_path() -> &'static str {
-    SOCKET_PATH
-}
-
 pub async fn start_ipc_server(app: AppHandle) -> Result<()> {
     let socket_path = Path::new(SOCKET_PATH);
     if socket_path.exists() {
@@ -163,15 +158,4 @@ fn capture_window_screenshot(output_path: &Path) -> Result<()> {
         .context("Failed to save screenshot")?;
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_socket_path() {
-        let path = get_socket_path();
-        assert!(!path.is_empty());
-    }
 }

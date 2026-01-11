@@ -27,3 +27,5 @@ dist-ssr
 
 # Claude Code temp directory
 .cctmp/
+
+target/

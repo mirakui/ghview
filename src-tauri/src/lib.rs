@@ -1,4 +1,5 @@
 mod commands;
+mod ipc;
 mod models;
 
 use commands::{
@@ -16,6 +17,15 @@ fn greet(name: &str) -> String {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .setup(|app| {
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                if let Err(e) = ipc::start_ipc_server(handle).await {
+                    eprintln!("Failed to start IPC server: {}", e);
+                }
+            });
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             greet,
             check_auth_status,

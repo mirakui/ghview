@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "ghview-mcp": {
+      "type": "stdio",
+      "command": "./target/release/ghview-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}

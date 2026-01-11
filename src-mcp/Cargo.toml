@@ -1,0 +1,16 @@
+[package]
+name = "ghview-mcp"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "MCP server for ghview - a GitHub PR viewer"
+
+[[bin]]
+name = "ghview-mcp"
+path = "src/main.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+anyhow.workspace = true

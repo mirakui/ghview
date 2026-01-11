@@ -5,9 +5,9 @@ use thiserror::Error;
 const KEYRING_SERVICE: &str = "ghview";
 const KEYRING_USER: &str = "github_oauth_token";
 
-// GitHub OAuth App credentials - these should be configured by the user
-// For development, we use the device flow which doesn't require a client secret
-const GITHUB_CLIENT_ID: &str = "Ov23liYVGwrgVcGVSFMl"; // Placeholder - user should replace
+// GitHub OAuth App credentials for ghview
+// Device flow doesn't require a client secret
+const GITHUB_CLIENT_ID: &str = "Iv23li78KgNyGR5C061j";
 
 #[derive(Debug, Error)]
 pub enum AuthError {

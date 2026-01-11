@@ -1,4 +1,5 @@
 use crate::commands::auth::{get_stored_token, AuthError};
+use crate::commands::debug::{log_request, log_response, log_response_error};
 use crate::models::{
     CheckState, CheckStatus, Label, PullRequest, PullRequestState, PullRequestWithChecks,
     Repository, StatusCheck, User,
@@ -159,6 +160,7 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
     let mut seen_ids: std::collections::HashSet<i64> = std::collections::HashSet::new();
 
     for query in queries {
+        log_request("GET", search_url);
         let response = client
             .get(search_url)
             .query(&[("q", query), ("sort", "updated"), ("order", "desc")])
@@ -167,9 +169,12 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
             .header("Accept", "application/vnd.github+json")
             .send()
             .await?;
+        log_response(search_url, response.status());
 
         if !response.status().is_success() {
+            let status = response.status();
             let error_text = response.text().await.unwrap_or_default();
+            log_response_error(search_url, status, &error_text);
             return Err(GitHubError::Api(format!(
                 "Failed to fetch PRs: {}",
                 error_text
@@ -193,6 +198,7 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
 
     for item in all_items {
         // Fetch repository details
+        log_request("GET", &item.repository_url);
         let repo_response = client
             .get(&item.repository_url)
             .header("Authorization", format!("Bearer {}", token))
@@ -200,6 +206,7 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
             .header("Accept", "application/vnd.github+json")
             .send()
             .await?;
+        log_response(&item.repository_url, repo_response.status());
 
         let repository: Repository = if repo_response.status().is_success() {
             let api_repo: ApiRepository = repo_response.json().await?;
@@ -232,6 +239,7 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
             "https://api.github.com/repos/{}/pulls/{}",
             repository.full_name, item.number
         );
+        log_request("GET", &pr_url);
         let pr_response = client
             .get(&pr_url)
             .header("Authorization", format!("Bearer {}", token))
@@ -239,6 +247,7 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
             .header("Accept", "application/vnd.github+json")
             .send()
             .await?;
+        log_response(&pr_url, pr_response.status());
 
         let requested_reviewers: Vec<User> = if pr_response.status().is_success() {
             #[derive(Deserialize)]
@@ -264,6 +273,7 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
             "https://api.github.com/repos/{}/commits/HEAD/status",
             repository.full_name
         );
+        log_request("GET", &status_url);
         let _status_response = client
             .get(&status_url)
             .header("Authorization", format!("Bearer {}", token))
@@ -324,6 +334,7 @@ async fn fetch_pr_check_status(
         pr.repository.full_name, pr.number
     );
 
+    log_request("GET", &pr_url);
     let pr_response = client
         .get(&pr_url)
         .header("Authorization", format!("Bearer {}", token))
@@ -331,6 +342,7 @@ async fn fetch_pr_check_status(
         .header("Accept", "application/vnd.github+json")
         .send()
         .await?;
+    log_response(&pr_url, pr_response.status());
 
     if !pr_response.status().is_success() {
         return Err(GitHubError::Api("Failed to fetch PR details".to_string()));
@@ -354,6 +366,7 @@ async fn fetch_pr_check_status(
         pr.repository.full_name, pr_head.head.sha
     );
 
+    log_request("GET", &status_url);
     let status_response = client
         .get(&status_url)
         .header("Authorization", format!("Bearer {}", token))
@@ -361,6 +374,7 @@ async fn fetch_pr_check_status(
         .header("Accept", "application/vnd.github+json")
         .send()
         .await?;
+    log_response(&status_url, status_response.status());
 
     if !status_response.status().is_success() {
         return Ok(CheckStatus {

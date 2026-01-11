@@ -147,32 +147,51 @@ pub async fn fetch_review_requested_prs() -> Result<Vec<PullRequestWithChecks>, 
     let token = get_stored_token()?;
     let client = reqwest::Client::new();
 
-    // Search for PRs where review is requested from the authenticated user
     let search_url = "https://api.github.com/search/issues";
-    let query = "is:pr is:open review-requested:@me";
 
-    let response = client
-        .get(search_url)
-        .query(&[("q", query), ("sort", "updated"), ("order", "desc")])
-        .header("Authorization", format!("Bearer {}", token))
-        .header("User-Agent", "ghview")
-        .header("Accept", "application/vnd.github+json")
-        .send()
-        .await?;
+    // Fetch both review-requested and assigned PRs
+    let queries = [
+        "is:pr is:open review-requested:@me",
+        "is:pr is:open assignee:@me",
+    ];
 
-    if !response.status().is_success() {
-        let error_text = response.text().await.unwrap_or_default();
-        return Err(GitHubError::Api(format!(
-            "Failed to fetch PRs: {}",
-            error_text
-        )));
+    let mut all_items: Vec<SearchItem> = Vec::new();
+    let mut seen_ids: std::collections::HashSet<i64> = std::collections::HashSet::new();
+
+    for query in queries {
+        let response = client
+            .get(search_url)
+            .query(&[("q", query), ("sort", "updated"), ("order", "desc")])
+            .header("Authorization", format!("Bearer {}", token))
+            .header("User-Agent", "ghview")
+            .header("Accept", "application/vnd.github+json")
+            .send()
+            .await?;
+
+        if !response.status().is_success() {
+            let error_text = response.text().await.unwrap_or_default();
+            return Err(GitHubError::Api(format!(
+                "Failed to fetch PRs: {}",
+                error_text
+            )));
+        }
+
+        let search_response: SearchResponse = response.json().await?;
+
+        // Deduplicate by PR id
+        for item in search_response.items {
+            if seen_ids.insert(item.id) {
+                all_items.push(item);
+            }
+        }
     }
 
-    let search_response: SearchResponse = response.json().await?;
+    // Sort by updated_at descending
+    all_items.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
 
     let mut prs_with_checks = Vec::new();
 
-    for item in search_response.items {
+    for item in all_items {
         // Fetch repository details
         let repo_response = client
             .get(&item.repository_url)

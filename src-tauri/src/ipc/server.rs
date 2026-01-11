@@ -118,22 +118,40 @@ async fn capture_screenshot(app: &AppHandle, output_dir: &str) -> Result<String>
 }
 
 fn capture_window_screenshot(output_path: &Path) -> Result<()> {
+    use xcap::image::imageops::FilterType;
+    use xcap::image::DynamicImage;
     use xcap::Window;
 
-    // Find the ghview window
+    // Find the ghview window by app_name (more reliable than title)
     let windows = Window::all().context("Failed to enumerate windows")?;
     let ghview_window = windows
         .into_iter()
-        .find(|w| w.title().map(|t| t.contains("ghview")).unwrap_or(false))
-        .context("ghview window not found")?;
+        .find(|w| {
+            w.app_name()
+                .map(|name| name.to_lowercase() == "ghview")
+                .unwrap_or(false)
+        })
+        .context("ghview window not found (is ghview running?)")?;
 
-    // Capture the window
+    // Get logical window size (before scaling)
+    let logical_width = ghview_window.width().context("Failed to get window width")?;
+    let logical_height = ghview_window.height().context("Failed to get window height")?;
+
+    // Capture the window (this returns the actual pixel size on Retina displays)
     let image = ghview_window
         .capture_image()
         .context("Failed to capture window image")?;
 
+    // Resize to logical size if the captured image is larger (Retina display)
+    let resized = if image.width() > logical_width || image.height() > logical_height {
+        DynamicImage::ImageRgba8(image)
+            .resize_exact(logical_width, logical_height, FilterType::Lanczos3)
+    } else {
+        DynamicImage::ImageRgba8(image)
+    };
+
     // Save as PNG
-    image
+    resized
         .save(output_path)
         .context("Failed to save screenshot")?;
 

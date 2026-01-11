@@ -134,8 +134,12 @@ fn capture_window_screenshot(output_path: &Path) -> Result<()> {
         .context("ghview window not found (is ghview running?)")?;
 
     // Get logical window size (before scaling)
-    let logical_width = ghview_window.width().context("Failed to get window width")?;
-    let logical_height = ghview_window.height().context("Failed to get window height")?;
+    let logical_width = ghview_window
+        .width()
+        .context("Failed to get window width")?;
+    let logical_height = ghview_window
+        .height()
+        .context("Failed to get window height")?;
 
     // Capture the window (this returns the actual pixel size on Retina displays)
     let image = ghview_window
@@ -144,8 +148,11 @@ fn capture_window_screenshot(output_path: &Path) -> Result<()> {
 
     // Resize to logical size if the captured image is larger (Retina display)
     let resized = if image.width() > logical_width || image.height() > logical_height {
-        DynamicImage::ImageRgba8(image)
-            .resize_exact(logical_width, logical_height, FilterType::Lanczos3)
+        DynamicImage::ImageRgba8(image).resize_exact(
+            logical_width,
+            logical_height,
+            FilterType::Lanczos3,
+        )
     } else {
         DynamicImage::ImageRgba8(image)
     };

@@ -14,8 +14,8 @@ fn main() {
         let app_name = window.app_name().unwrap_or_else(|_| "<error>".to_string());
         let id = window.id().unwrap_or(0);
 
-        let is_ghview = title.to_lowercase().contains("ghview")
-            || app_name.to_lowercase().contains("ghview");
+        let is_ghview =
+            title.to_lowercase().contains("ghview") || app_name.to_lowercase().contains("ghview");
         let marker = if is_ghview { " <-- MATCH" } else { "" };
 
         println!("[{}] ID: {}", i, id);

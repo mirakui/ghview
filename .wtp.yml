@@ -29,9 +29,14 @@ hooks:
     #   from: .cursor/    # Cursor IDE settings
     #   to: .cursor/
     
-    # Run setup commands:
+    - type: copy
+      from: src-tauri/target/
+      to: src-tauri/target/
+
     - type: command
       command: mise trust && mise i
     - type: command
       command: mise x -- pnpm i
-
+    - type: command
+      command: mise x -- cargo build
+      work_dir: ./src-tauri

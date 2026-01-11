@@ -1,9 +1,7 @@
-use keyring::Entry;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-const KEYRING_SERVICE: &str = "ghview";
-const KEYRING_USER: &str = "github_oauth_token";
+use super::credential::{delete_credentials, load_credentials, save_credentials, Credentials};
 
 // GitHub OAuth App credentials for ghview
 // Device flow doesn't require a client secret
@@ -11,8 +9,8 @@ const GITHUB_CLIENT_ID: &str = "Iv23li78KgNyGR5C061j";
 
 #[derive(Debug, Error)]
 pub enum AuthError {
-    #[error("Keyring error: {0}")]
-    Keyring(String),
+    #[error("Credential error: {0}")]
+    Credential(String),
     #[error("Network error: {0}")]
     Network(#[from] reqwest::Error),
     #[error("OAuth error: {0}")]
@@ -69,21 +67,18 @@ struct GitHubUser {
     login: String,
 }
 
-fn get_keyring_entry() -> Result<Entry, AuthError> {
-    Entry::new(KEYRING_SERVICE, KEYRING_USER).map_err(|e| AuthError::Keyring(e.to_string()))
-}
-
 #[tauri::command]
 pub async fn check_auth_status() -> Result<AuthStatus, AuthError> {
-    let entry = get_keyring_entry()?;
-
-    match entry.get_password() {
-        Ok(token) => {
+    match load_credentials() {
+        Ok(credentials) => {
             // Verify token by fetching user info
             let client = reqwest::Client::new();
             let response = client
                 .get("https://api.github.com/user")
-                .header("Authorization", format!("Bearer {}", token))
+                .header(
+                    "Authorization",
+                    format!("Bearer {}", credentials.access_token),
+                )
                 .header("User-Agent", "ghview")
                 .header("Accept", "application/vnd.github+json")
                 .send()
@@ -97,7 +92,7 @@ pub async fn check_auth_status() -> Result<AuthStatus, AuthError> {
                 })
             } else {
                 // Token is invalid, remove it
-                let _ = entry.delete_credential();
+                let _ = delete_credentials();
                 Ok(AuthStatus {
                     authenticated: false,
                     username: None,
@@ -174,10 +169,10 @@ pub async fn poll_device_flow(device_code: String) -> Result<AuthStatus, AuthErr
 
     if let Some(access_token) = token_response.access_token {
         // Store the token
-        let entry = get_keyring_entry()?;
-        entry
-            .set_password(&access_token)
-            .map_err(|e| AuthError::Keyring(e.to_string()))?;
+        let credentials = Credentials {
+            access_token: access_token.clone(),
+        };
+        save_credentials(&credentials).map_err(|e| AuthError::Credential(e.to_string()))?;
 
         // Get username
         let user_response = client
@@ -204,16 +199,11 @@ pub async fn poll_device_flow(device_code: String) -> Result<AuthStatus, AuthErr
 
 #[tauri::command]
 pub async fn logout() -> Result<(), AuthError> {
-    let entry = get_keyring_entry()?;
-    entry
-        .delete_credential()
-        .map_err(|e| AuthError::Keyring(e.to_string()))?;
+    delete_credentials().map_err(|e| AuthError::Credential(e.to_string()))?;
     Ok(())
 }
 
 pub fn get_stored_token() -> Result<String, AuthError> {
-    let entry = get_keyring_entry()?;
-    entry
-        .get_password()
-        .map_err(|_| AuthError::NotAuthenticated)
+    let credentials = load_credentials().map_err(|_| AuthError::NotAuthenticated)?;
+    Ok(credentials.access_token)
 }

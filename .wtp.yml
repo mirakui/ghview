@@ -16,8 +16,8 @@ hooks:
     #   to: .env
 
     # Example: Run a command to show all worktrees
-    - type: command
-      command: wtp list
+    # - type: command
+    #   command: wtp list
 
     # More examples (commented out):
     
@@ -29,7 +29,7 @@ hooks:
     #   from: .cursor/    # Cursor IDE settings
     #   to: .cursor/
     
-    Run setup commands:
+    # Run setup commands:
     - type: command
       command: mise trust && mise i
     - type: command
